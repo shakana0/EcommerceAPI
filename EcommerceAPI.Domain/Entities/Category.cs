@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace EcommerceAPI.Domain;
 
 public class Category
@@ -16,6 +18,5 @@ public class Category
     {
         Name = name;
         Description = description;
-        ParentCategoryId = parentCategoryId;
     }
 }
