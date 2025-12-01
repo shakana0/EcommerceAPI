@@ -1,17 +1,36 @@
-using EcommerceAPI.Infrastructure;
+using EcommerceAPI.Domain.Interfaces;
 using EcommerceAPI.Infrastructure.Context;
+using EcommerceAPI.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Registrera DbContext
 builder.Services.AddDbContext<EcommerceApiDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Registrera repository
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
+
+app.UseCors("AllowFrontend");
 
 if (app.Environment.IsDevelopment())
 {
