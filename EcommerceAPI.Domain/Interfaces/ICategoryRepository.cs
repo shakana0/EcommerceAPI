@@ -1,12 +1,14 @@
 ﻿
+using EcommerceAPI.Domain.Entities;
+
 namespace EcommerceAPI.Domain.Interfaces
 {
     public interface ICategoryRepository
     {
-        Task<Category> AddAsync(Category category);
-        Task<IEnumerable<Category>> GetAllAsync();
-        Task<Category?> GetByIdAsync(int id);
-        Task UpdateAsync(Category category);
-        Task<bool> DeleteAsync(int id);
+        Task<Category> AddAsync(Category category, CancellationToken cancellationToken);
+        Task<IEnumerable<Category>> GetAllAsync(CancellationToken cancellationToken);
+        Task<Category?> GetByIdAsync(int id, CancellationToken cancellationToken);
+        Task UpdateAsync(Category category, CancellationToken cancellationToken);
+        Task<bool> DeleteAsync(int id, CancellationToken cancellationToken);
     }
 }
