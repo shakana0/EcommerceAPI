@@ -2,8 +2,11 @@ using EcommerceAPI.Domain.Interfaces;
 using EcommerceAPI.Infrastructure.Context;
 using EcommerceAPI.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using EcommerceAPI.Application.AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var licenseKey = builder.Configuration["LuckyPenny:LicenseKey"];
 
 // Registrera DbContext
 builder.Services.AddDbContext<EcommerceApiDbContext>(options =>
@@ -27,6 +30,17 @@ builder.Services.AddCors(options =>
                   .AllowAnyMethod();
         });
 });
+
+
+
+
+// AutoMapper
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.LicenseKey = licenseKey;
+    cfg.AddMaps(typeof(AutoMapperProfile).Assembly);
+});
+
 
 var app = builder.Build();
 
