@@ -1,5 +1,6 @@
 ﻿using EcommerceAPI.Application.Products.Dtos;
 using EcommerceAPI.Application.Products.Queries.GetProductById;
+using EcommerceAPI.Application.Products.Queries.GetProducts;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,6 +29,12 @@ namespace EcommerceAPI.WebAPI.Controllers
             return Ok(product);
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetAll()
+        {
+            var products = await _mediator.Send(new GetAllProductsQuery());
+            return Ok(products);
+        }
 
     }
 }
