@@ -1,4 +1,5 @@
-﻿using EcommerceAPI.Application.Products.Dtos;
+﻿using EcommerceAPI.Application.Products.Commands.CreateProduct;
+using EcommerceAPI.Application.Products.Dtos;
 using EcommerceAPI.Application.Products.Queries.GetProductById;
 using EcommerceAPI.Application.Products.Queries.GetProducts;
 using MediatR;
@@ -34,6 +35,18 @@ namespace EcommerceAPI.WebAPI.Controllers
         {
             var products = await _mediator.Send(new GetAllProductsQuery());
             return Ok(products);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ProductDto>> Create([FromBody] CreateProductCommand command)
+        {
+            var product = await _mediator.Send(command);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = product.Id },
+                product
+            );
         }
 
     }
