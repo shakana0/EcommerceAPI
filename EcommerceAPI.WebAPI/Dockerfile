@@ -8,7 +8,7 @@ WORKDIR /src
 
 COPY . .
 
-RUN dotnet restore EcommerceAPI.sln
+RUN dotnet restore EcommerceAPI.WebAPI/EcommerceAPI.WebAPI.csproj
 
 RUN dotnet publish EcommerceAPI.WebAPI/EcommerceAPI.WebAPI.csproj -c Release -o /app/publish
 
