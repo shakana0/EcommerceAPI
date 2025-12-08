@@ -8,24 +8,38 @@ using EcommerceAPI.Infrastructure.Repositories;
 using EcommerceAPI.WebAPI.Extensions;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 var licenseKey = builder.Configuration["LuckyPenny:LicenseKey"];
 
-// Registrera DbContext
+// DbContext
 builder.Services.AddDbContext<EcommerceApiDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Registrera repository
+// Repositories
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Ecommerce API",
+        Version = "v1",
+        Description = "API för e‑handel"
+    });
+});
+
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -44,7 +58,6 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(GetCategoryByIdHandler).Assembly);
 });
 
-
 // AutoMapper
 builder.Services.AddAutoMapper(cfg =>
 {
@@ -52,16 +65,25 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddMaps(typeof(AutoMapperProfile).Assembly);
 });
 
-//FluentValidation
+// FluentValidation
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCategoryCommandValidator>();
 
 var app = builder.Build();
 
+
+app.UseRouting();
 app.UseCors("AllowFrontend");
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ecommerce API V1");
+    c.RoutePrefix = string.Empty; // Swagger UI på root (/)
+});
+
+// Health endpoint för snabb test
+app.MapGet("/health", () => "OK");
 
 app.UseValidationExceptionHandler();
 app.UseAuthorization();
