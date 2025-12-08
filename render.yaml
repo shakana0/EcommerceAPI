@@ -2,6 +2,6 @@ services:
   - type: web
     name: ecommerceapi-webapi
     env: docker
-    rootDir: EcommerceAPI.WebAPI
-    dockerfilePath: EcommerceAPI.WebAPI/Dockerfile
+    rootDir: .
+    dockerfilePath: Dockerfile
     plan: free
