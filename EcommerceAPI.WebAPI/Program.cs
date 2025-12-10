@@ -1,5 +1,3 @@
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
 using EcommerceAPI.Application.AutoMapper;
 using EcommerceAPI.Application.Behaviors;
 using EcommerceAPI.Application.Categories.Commands.CreateCategory;
@@ -8,6 +6,7 @@ using EcommerceAPI.Application.Infrastructure.Config;
 using EcommerceAPI.Domain.Interfaces;
 using EcommerceAPI.Infrastructure.Context;
 using EcommerceAPI.Infrastructure.Repositories;
+using EcommerceAPI.Infrastructure.Secrets;
 using EcommerceAPI.WebAPI.Extensions;
 using FluentValidation;
 using MediatR;
@@ -20,29 +19,21 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // // Configuration
-// Load secrets from Azure Key Vault
-var licenseVaultUri = new Uri("https://luckypenny-license-key.vault.azure.net/");
-var connstrVaultUri = new Uri("https://connstr-ecomdb.vault.azure.net/");
-var credential = new DefaultAzureCredential();
-
-var licenseClient = new SecretClient(licenseVaultUri, credential);
-var connstrClient = new SecretClient(connstrVaultUri, credential);
-
-var licenseKey = licenseClient.GetSecret("LicenseKey").Value.Value;
-var connectionString = connstrClient.GetSecret("EcommerceDb").Value.Value;
 
 //register secrets as singleton
-builder.Services.AddSingleton(new SecretsConfig
+builder.Services.AddSingleton<SecretsProvider>();
+
+builder.Services.AddSingleton(sp => new SecretsConfig
 {
-    LicenseKey = licenseKey,
-    ConnectionString = connectionString
+    LicenseKey = sp.GetRequiredService<SecretsProvider>().GetLicenseKey(),
+    ConnectionString = sp.GetRequiredService<SecretsProvider>().GetConnectionString()
 });
 
 // DbContext
 builder.Services.AddDbContext<EcommerceApiDbContext>((sp, options) =>
 {
-    var secrets = sp.GetRequiredService<SecretsConfig>();
-    options.UseSqlServer(secrets.ConnectionString);
+    var secretsProvider = sp.GetRequiredService<SecretsProvider>();
+    options.UseSqlServer(secretsProvider.GetConnectionString());
 });
 
 
