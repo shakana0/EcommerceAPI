@@ -46,7 +46,20 @@ namespace EcommerceAPI.Infrastructure.Secrets
         {
             try
             {
-                return _connstrClient.GetSecret("EcommerceDb").Value.Value;
+                var runningInAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
+
+                if (runningInAzure)
+                {
+                    // Prod secret Managed Identity
+                    var secret = _connstrClient.GetSecret("EcommerceDb");
+                    return secret.Value.Value;
+                }
+                else
+                {
+                    // Dev secret SQL login or AAD password
+                    var secret = _connstrClient.GetSecret("EcommerceDb-Dev");
+                    return secret.Value.Value;
+                }
             }
             catch (Exception ex)
             {
