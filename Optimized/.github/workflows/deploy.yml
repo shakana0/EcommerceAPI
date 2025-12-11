@@ -21,7 +21,7 @@ jobs:
         run: dotnet restore EcommerceAPI.sln
 
       - name: Publish
-        run: dotnet publish ./EcommerceAPI.WebAPI/EcommerceAPI.WebAPI.csproj -c Release -o ./publish
+        run: dotnet publish ./Optimized/EcommerceAPI.WebAPI/EcommerceAPI.WebAPI.csproj -c Release -o ./publish
 
       - name: Azure Login
         uses: azure/login@v1

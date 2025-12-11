@@ -1,0 +1,81 @@
+﻿using EcommerceAPI.Application.Categories.Commands.CreateCategory;
+using EcommerceAPI.Application.Categories.Commands.DeleteCategory;
+using EcommerceAPI.Application.Categories.Commands.UpdateCategory;
+using EcommerceAPI.Application.Categories.Dtos;
+using EcommerceAPI.Application.Categories.Queries.GetAllCategories;
+using EcommerceAPI.Application.Categories.Queries.GetCategoryById;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace EcommerceAPI.WebAPI.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class CategoriesController : ControllerBase
+    {
+        private readonly IMediator _mediator;
+
+        public CategoriesController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetAll()
+        {
+            var categories = await _mediator.Send(new GetAllCategoriesQuery());
+
+            return Ok(categories);
+        }
+
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CategoryDto>> GetById(int id)
+        {
+            var category = await _mediator.Send(new GetCategoryByIdQuery(id));
+            if (category == null)
+                return NotFound($"No Category Found For Id: {id}");
+
+            return Ok(category);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<ActionResult<CategoryDto>> Create([FromBody] CreateCategoryCommand command)
+        {
+            var category = await _mediator.Send(new CreateCategoryCommand(command.Name, command.Description));
+            return CreatedAtAction(nameof(GetById), new { id = category.Id }, category);
+        }
+
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<ActionResult<CategoryDto>> Update(int id, [FromBody] UpdateCategoryCommand command)
+        {
+            if (id != command.Id)
+                return BadRequest($"Route id: {id} and body id: {command.Id} must match.");
+
+            var updatedCategory = await _mediator.Send(command);
+
+            if (updatedCategory == null)
+                return NotFound($"No Category found for Id: {id}");
+
+            return Ok(updatedCategory);
+        }
+
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _mediator.Send(new DeleteCategoryCommand(id));
+
+            if (!result)
+                return NotFound($"No Category found for Id: {id}");
+
+            return NoContent();
+        }
+
+    }
+}
