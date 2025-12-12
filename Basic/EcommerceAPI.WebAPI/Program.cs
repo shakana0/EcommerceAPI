@@ -63,6 +63,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireClaim("org_role", "org:admin"));
+});
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
