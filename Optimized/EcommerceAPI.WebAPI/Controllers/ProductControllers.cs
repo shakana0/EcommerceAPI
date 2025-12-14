@@ -1,4 +1,5 @@
-﻿using EcommerceAPI.Application.Products.Commands.CreateProduct;
+﻿using System.Diagnostics;
+using EcommerceAPI.Application.Products.Commands.CreateProduct;
 using EcommerceAPI.Application.Products.Commands.DeleteProduct;
 using EcommerceAPI.Application.Products.Commands.UpdateProduct;
 using EcommerceAPI.Application.Products.Dtos;
@@ -16,9 +17,11 @@ namespace EcommerceAPI.WebAPI.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public ProductsController(IMediator mediator)
+        private readonly ILogger<ProductsController> _logger;
+        public ProductsController(IMediator mediator, ILogger<ProductsController> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
 
         [HttpGet("{id}")]
@@ -34,9 +37,11 @@ namespace EcommerceAPI.WebAPI.Controllers
 
         [HttpGet]
         public async Task<ActionResult<PagedResult<ProductDto>>> GetAll(
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 20)
+     [FromQuery] int page = 1,
+     [FromQuery] int pageSize = 20)
         {
+            var sw = Stopwatch.StartNew();
+
             var query = new GetAllProductsQuery
             {
                 Page = page,
@@ -44,6 +49,20 @@ namespace EcommerceAPI.WebAPI.Controllers
             };
 
             var products = await _mediator.Send(query);
+
+            sw.Stop();
+
+            // Log structured info
+            _logger.LogApiRequest(
+                endpoint: "/products",
+                query: $"page={page}&pageSize={pageSize}",
+                statusCode: 200,
+                responseTimeMs: sw.ElapsedMilliseconds,
+                cacheStatus: "unknown",
+                subscription: "unknown",
+                resultCount: products.Items.Count()
+            );
+
             return Ok(products);
         }
 
