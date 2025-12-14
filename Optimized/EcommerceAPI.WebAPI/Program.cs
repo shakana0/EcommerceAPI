@@ -10,6 +10,7 @@ using EcommerceAPI.Infrastructure.Secrets;
 using EcommerceAPI.WebAPI.Extensions;
 using FluentValidation;
 using MediatR;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -117,12 +118,36 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Async(a => a.File(
         path: "logs/log.txt",
         rollingInterval: RollingInterval.Day, // new file per day
-        retainedFileCountLimit: 7,            // save last 7 days
+        retainedFileCountLimit: 7,            // keep last 7 days
         shared: true                          // allows several processes
     ))
+    .WriteTo.ApplicationInsights(
+    builder.Configuration["ApplicationInsights:ConnectionString"],
+    TelemetryConverter.Traces)
+
     .CreateLogger();
 
 builder.Host.UseSerilog();
+
+//Azure Application Insights
+builder.Services.AddApplicationInsightsTelemetry(options =>
+{
+    options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
+
+    options.EnableAdaptiveSampling = true;
+
+    options.EnablePerformanceCounterCollectionModule = false;
+    options.EnableDependencyTrackingTelemetryModule = false;
+});
+
+// Configure sampling-procent
+builder.Services.Configure<TelemetryConfiguration>(config =>
+{
+    config.DefaultTelemetrySink.TelemetryProcessorChainBuilder
+        .UseSampling(5.0) // keep 5% of telemetri
+        .Build();
+});
+
 
 var app = builder.Build();
 
@@ -142,7 +167,7 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty;
 });
 
-// Health endpoint för snabb test
+// Health endpoint for quick test
 app.MapGet("/health", () => "OK");
 
 app.UseValidationExceptionHandler();
