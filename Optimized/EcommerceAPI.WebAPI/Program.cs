@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -109,6 +110,19 @@ builder.Services.AddAutoMapper(cfg => { }, typeof(AutoMapperProfile).Assembly);
 // FluentValidation
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCategoryCommandValidator>();
+
+//Serilog
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Async(a => a.File(
+        path: "logs/log.txt",
+        rollingInterval: RollingInterval.Day, // new file per day
+        retainedFileCountLimit: 7,            // save last 7 days
+        shared: true                          // allows several processes
+    ))
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 var app = builder.Build();
 
