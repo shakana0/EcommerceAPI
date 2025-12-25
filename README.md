@@ -1,4 +1,4 @@
-## ProductCatalogAPI (Basic API vs Optimized API)
+# ProductCatalogAPI (Basic API vs Optimized API)
 This repository contains two versions of the EcommerceAPI, both serving the same product catalog but built to demonstrate the impact of API optimization, cloud integration, and load testing.
 Both APIs are consumed by the shared frontend ProductCatalogUI.
 
@@ -89,13 +89,32 @@ This view shows threshold analysis in Grafana Cloud, highlighting cache efficien
 
 ---
 ## Result based on test
-- Basic API: higher response times, no caching, all requests hit the database.
+- Basic API: higher response times, no caching, and the frontend visibly froze when attempting to load all 5,000 products at once.
 - Optimized API: lower and stable P95, caching active via Azure API Management, but heavy rate limiting because all k6 users share one IP.
 
 ## 🚀 Improvement Opportunities
-- Use distributed load testing for more realistic rate‑limit behavior.
-- Improve cache hit/miss tracking for clearer metrics.
-- Add more observability signals in App Insights and Grafana.
+- Use distributed load testing to simulate realistic client behavior and avoid single‑IP rate‑limit bias.
+- Extend the test duration to capture long‑running performance patterns and stability over time.
+- Increase the API Management rate‑limit threshold to better reflect real production traffic.
+- Enhance cache hit/miss tracking for clearer visibility into caching efficiency.
+- Expand observability with additional custom metrics and logs in Application Insights and Grafana.
+
+---
+## 💸 Cost‑Aware Cloud Architecture Decisions
+When optimizing the API, I also had to design it to run cost‑efficiently in Azure.
+The Optimized API uses several cloud services — Key Vault, API Management, Application Insights, Azure SQL Database, and App Service — and each of these can generate cost under heavy load.
+Because of this, I made a few deliberate architectural choices to keep performance high while keeping costs predictable.
+
+### Application Insights Sampling
+- During load testing, logging every request becomes expensive.
+I enabled adaptive sampling and kept only 5% of telemetry to reduce cost while still capturing reliable performance data.
+
+### Efficient Secret Management
+- Key Vault charges per secret retrieval. To avoid repeated lookups, I used a centralized SecretsProvider as a singleton, loading secrets once at startup and reusing them across the app.
+
+### Balancing Performance and Cost
+- These choices keep the API fast, observable, and stable under high load — while avoiding unnecessary Azure consumption
+
 ---
 ## 🛠️ How to Run Locally
 1. Clone the repository  
