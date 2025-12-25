@@ -27,6 +27,7 @@ A visual representation of the system’s layered structure — from the Web API
 <img src="./assets/architecture.png" width="500" alt="Clean Architecture layers showing Web API, Application, Domain, Infrastructure, Azure APIM, and CI/CD pipeline" />
 
 It illustrates how each layer interacts according to the Clean Architecture principles, ensuring a clear separation of concerns and testability.
+
 ---
 ## Shared Architecture
 Both APIs use:
@@ -59,7 +60,7 @@ This ensures a fair, apples‑to‑apples comparison.
 
 ---
 ## 📊 Load Testing (k6)
-## Both APIs are tested under identical load:
+### Both APIs are tested under identical load:
 <img src="./assets/load.png" width="500" alt="Image of simulation virtual users making rquest to the same server at the same time" />
 
 - Each database contains **5,000 product rows**
