@@ -1,6 +1,6 @@
-## EcommerceAPI – Product Catalog (Basic API vs Optimized API)
+## ProductCatalogAPI (Basic API vs Optimized API)
 This repository contains two versions of the EcommerceAPI, both serving the same product catalog but built to demonstrate the impact of API optimization, cloud integration, and load testing.
-Both APIs are consumed by the shared frontend EcommerceUI.
+Both APIs are consumed by the shared frontend ProductCatalogUI.
 
 ---
 ## Purpose of the Project
@@ -98,7 +98,7 @@ This view shows threshold analysis in Grafana Cloud, highlighting cache efficien
 1. Clone the repository  
 2. Start the local SQL database via Docker (`docker-compose up -d`)  
 3. Run either API project from Visual Studio or `dotnet run`  
-4. The frontend (EcommerceUI) will automatically target the selected API version
+4. The frontend (ProductCatalogUI) will target the API version based on toggle button
 
 ---
 ## 🧰 Tech Stack
