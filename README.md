@@ -13,8 +13,13 @@ The goal of this project is to compare a Basic API and an Optimized API under id
 - Developer experience
 
 The project highlights how the same domain logic can behave very differently depending on infrastructure, caching, rate limiting, and observability.
----
 
+---
+## ProductCatalogUI - Frontend
+<img src="./assets/prodcat1.png" width="500" alt="ProductCatalogUI displaying product cards while targeting API version based on toggle state" />
+This view shows the product catalog page in ProductCatalogUI. The frontend dynamically selects the API version based on the green toggle button, allowing seamless switching between environments.
+
+---
 
 ## Clean Architecture Overview
 A visual representation of the system’s layered structure — from the Web API down to the Domain and Infrastructure layers.
@@ -22,8 +27,6 @@ A visual representation of the system’s layered structure — from the Web API
 <img src="./assets/architecture.png" width="500" alt="Clean Architecture layers showing Web API, Application, Domain, Infrastructure, Azure APIM, and CI/CD pipeline" />
 
 It illustrates how each layer interacts according to the Clean Architecture principles, ensuring a clear separation of concerns and testability.
-
-
 ---
 ## Shared Architecture
 Both APIs use:
@@ -56,7 +59,8 @@ This ensures a fair, apples‑to‑apples comparison.
 
 ---
 ## 📊 Load Testing (k6)
-Both APIs are tested under identical load:
+## Both APIs are tested under identical load:
+<img src="./assets/load.png" width="500" alt="Image of simulation virtual users making rquest to the same server at the same time" />
 
 - Each database contains **5,000 product rows**
 - 50 virtual users
@@ -98,11 +102,6 @@ This view shows threshold analysis in Grafana Cloud, highlighting cache efficien
 2. Start the local SQL database via Docker (`docker-compose up -d`)  
 3. Run either API project from Visual Studio or `dotnet run`  
 4. The frontend (ProductCatalogUI) will target the API version based on toggle button
-
----
-## ProductCatalogUI - Frontend
-<img src="./assets/prodcat1.png" width="500" alt="ProductCatalogUI displaying product cards while targeting API version based on toggle state" />
-This view shows the product catalog page in ProductCatalogUI. The frontend dynamically selects the API version based on the green toggle button, allowing seamless switching between environments.
 
 ---
 ## 🧰 Tech Stack
