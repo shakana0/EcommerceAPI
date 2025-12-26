@@ -22,18 +22,28 @@ namespace EcommerceAPI.Infrastructure.Repositories
             return product;
         }
 
-        public async Task<IEnumerable<Product>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Product>> GetPagedAsync(int page, int pageSize, int? categoryId, CancellationToken cancellationToken)
         {
-            return await _context.Products
+            var query = _context.Products
                 .Include(p => p.Category)
+                .AsQueryable();
+
+            if (categoryId.HasValue)
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+
+            return await query
+                .OrderBy(p => p.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync(cancellationToken);
+
         }
 
-        public async Task<int> CountAsync(CancellationToken cancellationToken)
+        public async Task<int> CountAsync(int? categoryId, CancellationToken cancellationToken)
         {
-            return await _context.Products.CountAsync(cancellationToken);
+            var query = _context.Products.AsQueryable();
+            if (categoryId.HasValue) query = query.Where(p => p.CategoryId == categoryId.Value);
+            return await query.CountAsync(cancellationToken);
         }
 
         public async Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken)
