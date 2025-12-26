@@ -6,8 +6,8 @@ namespace EcommerceAPI.Domain.Interfaces
     public interface IProductRepository
     {
         Task<Product> AddAsync(Product product, CancellationToken cancellationToken);
-        Task<IEnumerable<Product>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken);
-        Task<int> CountAsync(CancellationToken cancellationToken);
+        Task<IEnumerable<Product>> GetPagedAsync(int page, int pageSize, int? categoryId, CancellationToken cancellationToken);
+        Task<int> CountAsync(int? categoryId, CancellationToken cancellationToken);
         Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken);
         Task<Product?> UpdateAsync(int id, string name, string description, decimal price, int stockQuantity, int categoryId, CancellationToken cancellationToken);
         Task<bool> DeleteAsync(int id, CancellationToken cancellationToken);
