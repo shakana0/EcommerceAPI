@@ -18,8 +18,8 @@ namespace EcommerceAPI.Application.Products.Queries.GetProducts
 
         public async Task<PagedResult<ProductDto>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
         {
-            var totalCount = await _productRepository.CountAsync(cancellationToken);
-            var products = await _productRepository.GetPagedAsync(request.Page, request.PageSize, cancellationToken);
+            var totalCount = await _productRepository.CountAsync(request.CategoryId, cancellationToken);
+            var products = await _productRepository.GetPagedAsync(request.Page, request.PageSize, request.CategoryId, cancellationToken);
 
             return new PagedResult<ProductDto>
             {
